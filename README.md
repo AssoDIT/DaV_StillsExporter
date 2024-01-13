@@ -1,6 +1,8 @@
 # DaV_StillsExporter
 Batch export stills from timeline markers (DaV Python API)
-<br/>Author : [Olivier Patron](https://github.com/Luronnade)
+<br/>**Python version**: 3.6
+<br/>**Dependencies**: none
+<br/>**Author**: [Olivier Patron](https://github.com/Luronnade)
 
 ## Installation et usage 
 Le script s'appelle depuis le terminal (sous MacOs uniquement) et est écrit en Python. Il utilise l'API de DaVinci Resolve, qui dépend de Python 3.6. 
