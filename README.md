@@ -1,6 +1,7 @@
-# DaV_StillsExporter
+# DaV_StillsExporter :camera_flash:
 Batch export stills from timeline markers (DaV Python API)
-<br/>**Python version**: 3.6
+
+**Python version**: 3.6
 <br/>**Dependencies**: none
 <br/>**Author**: [Olivier Patron](https://github.com/Luronnade)
 
