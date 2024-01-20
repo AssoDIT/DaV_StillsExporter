@@ -44,7 +44,7 @@ Le script s'applique à la timeline Resolve actuellement ouverte.
 * **OutputPath**: le chemin de sortie, auquel peut se concaténer le nom de dossier passé en paramètre comme expliqué au-dessus <sup>(*)</sup>
 * **TimelineNamedFolder**: un dossier sera automatiquement généré et concaténé au chemin de sortie, qui prendra le même nom que la timeline. :warning: **ATTENTION** :warning: ce nom de dossier est écrasé si vous passez un nom de dossier dans l'appel de commande
 * **DeleteDRX**: si le script doit supprimer les DRX après exécution et ne garder que les images ou les conserver
-* **StillResolutionOverride**: Yes pour activer l'override et appliquer la résolution définie avec StillWidth et StillHeight à la place de la résolution de la timeline
+* **StillResolutionOverride**: `Yes` pour activer l'override et appliquer la résolution définie avec `StillWidth` et `StillHeight` à la place de la résolution de la timeline
 
 Par exemple, pour appeler le script dans un dossier de sortie `/Users/olivier/STAR WARS - THE REMAKE/STILLS/`, avec un sous-dossier à la date du jour `20240105_Jour01`, et une galerie de stills Resolve nommée `J01` il faut :
 * dans le fichier `config.ini` : `OutputFolder:"/Users/olivier/STAR WARS - THE REMAKE/STILLS/"`
