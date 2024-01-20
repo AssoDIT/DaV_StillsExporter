@@ -12,12 +12,28 @@ Le script s'appelle depuis le terminal (sous MacOs uniquement) et est écrit en 
 
 Pour appeler le script depuis le terminal (en étant dans le dossier où est posé le script) :
 ```
-python3 dav_stills_out.py
+python3 davstills.py
 ```
-
+Usage complet :
+```
+davstills.py [-h] [-o OUTPUT] [-g GALLERY]
+	-h, --help            	show this help message and exit
+  	-o OUTPUT, --output OUTPUT
+                        	stills output folder (will follow output path defined
+                        	in config.ini)
+  	-g GALLERY, --gallery GALLERY
+                        	stills gallery name (must exist in Resolve project)
+```
 Pour appeler le script avec un dossier de sortie spécifique <sup>(*)</sup> :
 ```
-python3 dav_stills_out.py "DossierDeSortie"
+python3 davstills.py --output "DossierDeSortie"
+python3 davstills.py -o "DossierDeSortie"
+```
+
+Pour appeler le script avec un nom de galerie spécifique :
+```
+python3 davstills.py --gallery "NomDeLaGalerie"
+python3 davstills.py -g "NomDeLaGalerie"
 ```
 
 Le script s'applique à la timeline Resolve actuellement ouverte.
@@ -30,9 +46,9 @@ Le script s'applique à la timeline Resolve actuellement ouverte.
 * **DeleteDRX**: si le script doit supprimer les DRX après exécution et ne garder que les images ou les conserver
 * **StillResolutionOverride**: Yes pour activer l'override et appliquer la résolution définie avec StillWidth et StillHeight à la place de la résolution de la timeline
 
-Par exemple, pour appeler le script dans un dossier de sortie `/Users/olivier/STAR WARS - THE REMAKE/STILLS/`, avec un sous-dossier à la date du jour `20240105_Jour01`, il faut :
+Par exemple, pour appeler le script dans un dossier de sortie `/Users/olivier/STAR WARS - THE REMAKE/STILLS/`, avec un sous-dossier à la date du jour `20240105_Jour01`, et une galerie de stills Resolve nommée `J01` il faut :
 * dans le fichier `config.ini` : `OutputFolder:"/Users/olivier/STAR WARS - THE REMAKE/STILLS/"`
-* appeler le script : `python3 dav_stills_out.py "20240105_Jour01"`
+* appeler le script : `python3 davstills.py --output "20240105_Jour01" --gallery "J01"`  ou `python3 davstills.py -o "20240105_Jour01" -g "J01"`
 
 > [!CAUTION]
 > Faites bien des tests, en particulier si vous choisissez d'utiliser une résolution spécifique pour les stills. En effet, pour changer de résolution, la timeline entière change de résolution le temps de sortir les stills. Si le script plante en cours de route, il n'aura pas eu le temps de rétablir votre résolution de timeline initiale !

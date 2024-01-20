@@ -3,6 +3,7 @@
 # DaVinci Resolve API driven script to export all marked frames in a timeline as a still
 
 import sys
+import argparse
 import os
 import glob
 
@@ -23,7 +24,7 @@ class IniOpen:
         for i in range(len(split_content)):
             if split_content[i].find("#") == 0:
                 continue
-            elif split_content[i].find("#") == -1 and split_content[i].find(":"):
+            elif split_content[i].find("#") == -1 and split_content[i].find(":") > 0:
                 pairs = split_content[i]
                 split_pairs = pairs.split(":")
                 inikey = split_pairs[0]
@@ -101,6 +102,14 @@ def scrubDavBins(parentFolder):
     return bins
 
 
+parser = argparse.ArgumentParser(
+    description='description: DaVinci API driven script that will export all marked stills from the current timeline',
+    epilog='other parameters are available in config.ini sidecar file')
+parser.add_argument('-o', '--output', help='stills output folder (will follow output path defined in config.ini)')
+parser.add_argument('-g', '--gallery', help='stills gallery name (must exist in Resolve project)')
+# parser.description('blab labl a')
+args = parser.parse_args()
+
 resolve = GetResolve()
 if not resolve:
     print("[DAV script] \U0000274C ERROR: Unable to get to Resolve!")
@@ -110,8 +119,21 @@ if not resolve:
 projectManager = resolve.GetProjectManager()
 resolve.OpenPage("Color")
 
+if not os.path.exists(os.path.join(os.path.dirname(sys.argv[0]), "config.ini")):
+    f = open(os.path.join(os.path.dirname(sys.argv[0]), "config.ini"), 'x')
+    f.write('MarkerColor:Blue\n')
+    f.write('LimitInOut:No\n')
+    f.write('Gallery:Stills\n')
+    f.write('OutputPath:\n')
+    f.write('TimelineNamedFolder:\n')
+    f.write('DeleteDRX:Yes\n')
+    f.write('StillResolutionOverride:Yes\n')
+    f.write('StillWidth:3840\n')
+    f.write('StillHeight:2160\n')
+    f.close()
+    print("[DAV script] \U00002757 WARNING: config.ini file was missing, created new one with default values.")
+
 iniSettings = IniOpen(os.path.join(os.path.dirname(sys.argv[0]), "config.ini"))
-# print(iniSettings.parse)  # DEBUG
 
 project = projectManager.GetCurrentProject()
 if not project:
@@ -130,8 +152,8 @@ gallery = project.GetGallery()  # prepare stills gallery for gathering new still
 galleryAllAlbums = gallery.GetGalleryStillAlbums()
 
 galleryName = iniSettings.read("Gallery")
-if len(sys.argv) == 3:
-    galleryName = sys.argv[2]
+if args.gallery is not None:
+    galleryName = args.gallery
 
 galleryAlbum = None
 for album in galleryAllAlbums:
@@ -207,8 +229,8 @@ if gradedStillsPath == "":
     gradedStillsPath = os.path.join(os.path.expanduser('~'), "Documents")
 
 timelineNamed = iniSettings.read("TimelineNamedFolder")
-if len(sys.argv) == 2:
-    gradedStillsPath = os.path.join(gradedStillsPath, sys.argv[1])
+if args.output is not None:
+    gradedStillsPath = os.path.join(gradedStillsPath, args.output)
 elif timelineNamed != "":
     gradedStillsPath = os.path.join(gradedStillsPath, timeline.GetName())
 
