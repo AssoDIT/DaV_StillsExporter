@@ -130,8 +130,8 @@ gallery = project.GetGallery()  # prepare stills gallery for gathering new still
 galleryAllAlbums = gallery.GetGalleryStillAlbums()
 
 galleryName = iniSettings.read("Gallery")
-if len(sys.argv) == 2:
-    galleryName = sys.argv[1]
+if len(sys.argv) == 3:
+    galleryName = sys.argv[2]
 
 galleryAlbum = None
 for album in galleryAllAlbums:
