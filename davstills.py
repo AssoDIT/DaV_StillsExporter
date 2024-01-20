@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Olivier PATRON - 2023 v1.04
+# Olivier PATRON - 2024 v1.05
 # DaVinci Resolve API driven script to export all marked frames in a timeline as a still
 
 import sys
