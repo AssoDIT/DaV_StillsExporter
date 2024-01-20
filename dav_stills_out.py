@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Olivier PATRON - 2023 v1.01
+# Olivier PATRON - 2023 v1.03
 # DaVinci Resolve API driven script to export all marked frames in a timeline as a still
 
 import sys
@@ -92,6 +92,15 @@ def tc_addTimecodeFrame(tc1, frame2, fps):
 def frame_addTimecodeFrame(tc1, frame2, fps):
     return timecodeToFrame(tc1, fps) + frame2
 
+# walk all project folders (bins) and subfolders, return list of every bins included in @parentFolder
+def scrubDavBins(parentFolder):
+    bins = []
+    bins += parentFolder.GetSubFolderList()
+    for subbin in bins:
+        bins += scrubDavBins(subbin)
+    return bins
+
+
 resolve = GetResolve()
 if not resolve:
     print("[DAV script] \U0000274C ERROR: Unable to get to Resolve!")
@@ -109,10 +118,13 @@ if not project:
     print("[DAV script] \U0000274C ERROR: Please open the expected project!")
     sys.exit()
 
+
 timeline = project.GetCurrentTimeline()  # idem as in project but for timeline : current with check or by name ?
 if not timeline:
     print("[DAV script] \U0000274C ERROR: No timeline found in project")
     sys.exit()
+
+framerate = timeline.GetSetting("timelineFrameRate")
 
 gallery = project.GetGallery()  # prepare stills gallery for gathering new stills (delete all...)
 galleryAllAlbums = gallery.GetGalleryStillAlbums()
@@ -137,7 +149,7 @@ gallery.SetCurrentStillAlbum(galleryAlbum)
 markers = timeline.GetMarkers()  # get all markers from timeline, will sort by [color]type later
 
 if len(markers) == 0:
-    print("[DAV script] \U0000274C No stills marked to export... Exiting the script")
+    print("[DAV script] \U00002757 WARNING: No stills marked to export... Exiting the script")
     print("Turning off the light \U0001F319\n\n")
     sys.exit()
 
@@ -145,12 +157,60 @@ for key in markers.copy():
     if not markers[key]['color'] == iniSettings.read("MarkerColor"):
         markers.pop(key)
 
+if len(markers) == 0:
+    print("[DAV script] \U00002757 WARNING: No stills marked to export... Exiting the script")
+    print("Turning off the light \U0001F319\n\n")
+    sys.exit()
+
+# if we want to export only markers inside in/out timeline's marks
+# we need to scrub all media pool folders to look for timeline and get its "clip settings" (thanks f*ck resolve api)
+if iniSettings.read("LimitInOut") == "Yes":
+    markIn = ""
+    markOut = ""
+    allBins = []
+    allBins.append(project.GetMediaPool().GetRootFolder())
+    allBins += scrubDavBins(allBins[0])
+    for bi in allBins:
+        allClipList = bi.GetClipList()
+        hasFound = False
+        for clip in allClipList:
+            if clip.GetName() == timeline.GetName():
+                markIn = clip.GetClipProperty("Start TC")
+                markOut = clip.GetClipProperty("End TC")
+                if clip.GetClipProperty("In") != "":
+                    markIn = clip.GetClipProperty("In")
+                if clip.GetClipProperty("Out") != "":
+                    markOut = clip.GetClipProperty("Out")
+                hasFound = True
+                break
+        if hasFound:
+            break
+
+    markIn_frame = timecodeToFrame(markIn, framerate)
+    markOut_frame = timecodeToFrame(markOut, framerate)
+    for key in markers.copy():
+        keyFrameNb = frame_addTimecodeFrame(timeline.GetStartTimecode(), key, framerate)
+        if keyFrameNb < markIn_frame:
+            markers.pop(key)
+            continue
+        if keyFrameNb > markOut_frame:
+            markers.pop(key)
+            continue
+
+    if len(markers) == 0:
+        print("[DAV script] \U00002757 WARNING: No stills marked to export inside in/out timeline's marks... Exiting the script")
+        print("Turning off the light \U0001F319\n\n")
+        sys.exit()
+
 gradedStillsPath = iniSettings.read("OutputFolder")
 if gradedStillsPath == "":
     gradedStillsPath = os.path.join(os.path.expanduser('~'), "Documents")
 
+timelineNamed = iniSettings.read("TimelineNamedFolder")
 if len(sys.argv) == 2:
     gradedStillsPath = os.path.join(gradedStillsPath, sys.argv[1])
+elif timelineNamed != "":
+    gradedStillsPath = os.path.join(gradedStillsPath, timeline.GetName())
 
 
 
@@ -159,12 +219,25 @@ print("\n\t\U0001F916\t\U0001F916\t\U0001F916")
 print("\tproject: " + project.GetName())
 print("\ttimeline: " + timeline.GetName())
 print("\tgallery: " + galleryName)
+print("\tstills output folder: " + gradedStillsPath)
+print("\n")
 print("\tstills marker color: " + iniSettings.read("MarkerColor"))
+timelineInOut = "No"
+if iniSettings.read("LimitInOut") == "Yes":
+    timelineInOut = "Yes"
+print("\ttimeline in/out only: " + timelineInOut)
 drxDelete = "No"
 if iniSettings.read("DeleteDRX") == "Yes":
     drxDelete = "Yes"
 print("\t.drx deletion: " + drxDelete)
-print("\tstills output folder: " + iniSettings.read("OutputFolder"))
+stillWidth = timeline.GetSetting('timelineResolutionWidth')
+stillHeight = timeline.GetSetting('timelineResolutionHeight')
+if iniSettings.read("StillResolutionOverride") == "Yes":
+    stillWidth = iniSettings.read("StillWidth")
+    stillHeight = iniSettings.read("StillHeight")
+print("\tstill width: " + stillWidth)
+print("\tstill height: " + stillHeight)
+
 print("\t\U0001F916\t\U0001F916\t\U0001F916")
 
 print("\n[DAV script] Expected number of stills:", len(markers))
@@ -185,7 +258,7 @@ if iniSettings.read("StillResolutionOverride") == "Yes":
 for key in markers:
     if markers[key]['color'] == iniSettings.read("MarkerColor"):
         # print("is blue")  # DEBUG
-        timeline.SetCurrentTimecode(tc_addTimecodeFrame(timeline.GetStartTimecode(), key, 24))
+        timeline.SetCurrentTimecode(tc_addTimecodeFrame(timeline.GetStartTimecode(), key, framerate))
         timeline.GrabStill()
 
 if stillsOverride:
