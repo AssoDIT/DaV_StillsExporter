@@ -22,9 +22,11 @@ python3 dav_stills_out.py "DossierDeSortie"
 
 Le script s'applique à la timeline Resolve actuellement ouverte.
 <br/>Le fichier de config `config.ini` est à conserver à côté du script. Il permet de régler les éléments suivants :
-* **MarkerColor**: Couleur des marqueurs utilisés pour identifier les stills (la liste proposée en commentaire n'est pas exhaustive, il y en a d'autres)
-* **Gallery**: Le nom de la galerie Resolve dans laquelle travaillera le script. :warning: **ATTENTION** :warning: cette galerie est vidée à chaque exécution du script
-* **OutputFolder**: le nom du dossier de sortie, auquel peut se concaténer le nom de dossier passé en paramètre comme expliqué au-dessus <sup>(*)</sup>
+* **MarkerColor**: couleur des marqueurs utilisés pour identifier les stills (la liste proposée en commentaire n'est pas exhaustive, il y en a d'autres)
+* **LimitInOut**: si réglé à `Yes`, seuls les marqueurs à l'intérieur des points in et out de la timeline seront considérés
+* **Gallery**: le nom de la galerie Resolve dans laquelle travaillera le script. :warning: **ATTENTION** :warning: cette galerie est vidée à chaque exécution du script
+* **OutputPath**: le chemin de sortie, auquel peut se concaténer le nom de dossier passé en paramètre comme expliqué au-dessus <sup>(*)</sup>
+* **TimelineNamedFolder**: un dossier sera automatiquement généré et concaténé au chemin de sortie, qui prendra le même nom que la timeline. :warning: **ATTENTION** :warning: ce nom de dossier est écrasé si vous passez un nom de dossier dans l'appel de commande
 * **DeleteDRX**: si le script doit supprimer les DRX après exécution et ne garder que les images ou les conserver
 * **StillResolutionOverride**: Yes pour activer l'override et appliquer la résolution définie avec StillWidth et StillHeight à la place de la résolution de la timeline
 

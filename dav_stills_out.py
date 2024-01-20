@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Olivier PATRON - 2023 v1.03
+# Olivier PATRON - 2023 v1.04
 # DaVinci Resolve API driven script to export all marked frames in a timeline as a still
 
 import sys
@@ -202,7 +202,7 @@ if iniSettings.read("LimitInOut") == "Yes":
         print("Turning off the light \U0001F319\n\n")
         sys.exit()
 
-gradedStillsPath = iniSettings.read("OutputFolder")
+gradedStillsPath = iniSettings.read("OutputPath")
 if gradedStillsPath == "":
     gradedStillsPath = os.path.join(os.path.expanduser('~'), "Documents")
 
@@ -280,7 +280,7 @@ else:
 print("\n[DAV script] Writing GRADED stills to disk.")
 
 if not os.path.exists(gradedStillsPath):
-    os.mkdir(gradedStillsPath)
+    os.makedirs(gradedStillsPath)
 
 if galleryAlbum.ExportStills(galleryAlbum.GetStills(), gradedStillsPath, "", "jpg"):
     print("[DAV script] SUCCESS: All stills were exported to disk.")
