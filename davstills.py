@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# Olivier PATRON - 2024 v1.05
+# Olivier PATRON - 2024 v1.06
 # DaVinci Resolve API driven script to export all marked frames in a timeline as a still
 
 import sys
@@ -146,7 +146,7 @@ if not timeline:
     print("[DAV script] \U0000274C ERROR: No timeline found in project")
     sys.exit()
 
-framerate = timeline.GetSetting("timelineFrameRate")
+framerate = int(timeline.GetSetting("timelineFrameRate"))
 
 gallery = project.GetGallery()  # prepare stills gallery for gathering new stills (delete all...)
 galleryAllAlbums = gallery.GetGalleryStillAlbums()
@@ -231,7 +231,7 @@ if gradedStillsPath == "":
 timelineNamed = iniSettings.read("TimelineNamedFolder")
 if args.output is not None:
     gradedStillsPath = os.path.join(gradedStillsPath, args.output)
-elif timelineNamed != "":
+elif timelineNamed == "Yes":
     gradedStillsPath = os.path.join(gradedStillsPath, timeline.GetName())
 
 
